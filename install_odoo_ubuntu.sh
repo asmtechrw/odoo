@@ -123,8 +123,8 @@ sudo npm install -g rtlcss
 #--------------------------------------------------
 if [ $INSTALL_WKHTMLTOPDF = "True" ]; then
   echo "=== Install wkhtmltopdf and place shortcuts on correct place for Odoo 18 ... ==="
-  sudo wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-2/wkhtmltox_0.12.6.1-2.jammy_amd64.deb 
-  sudo dpkg -i wkhtmltox_0.12.6.1-2.jammy_amd64.deb
+  sudo wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.jammy_amd64.deb 
+  sudo dpkg -i wkhtmltox_0.12.6.1-3.jammy_amd64.deb
   sudo apt install -f
   sudo cp /usr/local/bin/wkhtmltoimage /usr/bin/wkhtmltoimage
   sudo cp /usr/local/bin/wkhtmltopdf /usr/bin/wkhtmltopdf
@@ -156,8 +156,8 @@ sudo mkdir $OE_HOME/custom
 sudo mkdir $OE_HOME/custom/addons
 
 cd /usr/src/
-sudo git clone https://github.com/hrmuwanika/odooapps18.git
-cp -rf odooapps18/* $OE_HOME/custom/addons
+# sudo git clone https://github.com/hrmuwanika/odooapps18.git
+# cp -rf odooapps18/* $OE_HOME/custom/addons
 
 echo "Creating enterprise addons directory..."
 sudo mkdir $OE_HOME/enterprise
