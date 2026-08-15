@@ -181,8 +181,8 @@ fi
 sudo cat <<EOF > /etc/${OE_CONFIG}.conf
 [options]
 admin_passwd = ${OE_SUPERADMIN}
-db_host = False
-db_port = False
+db_host = localhost
+db_port = 5432
 db_user = $OE_USER
 db_password = False
 logfile = /var/log/${OE_USER}/${OE_CONFIG}.log
@@ -190,7 +190,13 @@ addons_path = ${OE_HOME_EXT}/addons, ${OE_HOME}/custom/addons, ${OE_HOME}/enterp
 http_port = ${OE_PORT}
 xmlrpc_port = ${OE_PORT}
 workers = 1
+max_cron_threads = 2
 list_db = True
+limit_memory_hard = 2684354560
+limit_memory_soft = 2147483648
+limit_request = 8192
+limit_time_cpu = 600
+limit_time_real = 1200
 EOF
 
 sudo chown $OE_USER:$OE_USER /etc/${OE_CONFIG}.conf
@@ -203,18 +209,20 @@ echo "=== Creating systemd service file... ==="
 sudo cat <<EOF > /lib/systemd/system/$OE_USER.service
 [Unit]
 Description=Odoo Open Source ERP and CRM
-After=network.target
+After=network.target postgresql.service
+Requires=postgresql.service
 
 [Service]
 Type=simple
 User=$OE_USER
 Group=$OE_USER
 ExecStart=$OE_HOME_EXT/odoo-bin --config /etc/${OE_CONFIG}.conf  --logfile /var/log/${OE_USER}/${OE_CONFIG}.log
-KillMode=mixed
+StandardOutput=journal+console
+Restart=on-failure
+RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
-
 EOF
 
 sudo chmod 755 /lib/systemd/system/$OE_USER.service
