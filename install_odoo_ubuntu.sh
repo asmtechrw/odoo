@@ -122,7 +122,9 @@ sudo npm install -g rtlcss
 # Install Wkhtmltopdf if needed
 #--------------------------------------------------
 if [ $INSTALL_WKHTMLTOPDF = "True" ]; then
-  echo "=== Install wkhtmltopdf and place shortcuts on correct place for Odoo 18 ... ==="
+  echo "=== Install wkhtmltopdf and place shortcuts on correct place for Odoo 19 ... ==="
+  sudo wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb
+  sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb
   sudo wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.jammy_amd64.deb 
   sudo dpkg -i wkhtmltox_0.12.6.1-3.jammy_amd64.deb
   sudo apt install -f
@@ -146,7 +148,7 @@ sudo chown -R $OE_USER:$OE_USER /var/log/$OE_USER
 #--------------------------------------------------
 # Install Odoo from source
 #--------------------------------------------------
-echo "=== Cloning Odoo 18 from GitHub ... ==="
+echo "=== Cloning Odoo 19 from GitHub ... ==="
 sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/odoo/odoo $OE_HOME_EXT/
 sudo pip3 install -r /$OE_HOME_EXT/requirements.txt --break-system-packages
 
