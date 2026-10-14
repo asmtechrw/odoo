@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ################################################################################
-# Odoo 18 Installation Script for Ubuntu 24.04 (could be used for other version too)
+# Odoo 20 Installation Script for Ubuntu 24.04 (could be used for other version too)
 # Author: Henry Robert Muwanika
 #-------------------------------------------------------------------------------
 # This script will install Odoo on your Ubuntu server. It can install multiple Odoo instances
@@ -25,9 +25,9 @@ OE_HOME_EXT="/opt/$OE_USER/${OE_USER}-server"
 INSTALL_WKHTMLTOPDF="True"
 # Set the default Odoo port (you still have to use -c /etc/odoo-server.conf for example to use this.)
 OE_PORT="8069"
-# Choose the Odoo version which you want to install. For example: 17.0, 16.0, 15.0 or 14.0. When using 'master' the master version will be installed.
+# Choose the Odoo version which you want to install. For example: 19.0, 18.0, 17.0 or 116.0. When using 'master' the master version will be installed.
 # IMPORTANT! This script contains extra libraries that are specifically needed for Odoo 14.0
-OE_VERSION="18.0"
+OE_VERSION="20.0"
 # Installs postgreSQL V16 instead of defaults (e.g V16 for Ubuntu 24.04) - this improves performance
 INSTALL_POSTGRESQL_SIXTEEN="True"
 # Set this to True if you want to install Nginx!
@@ -80,7 +80,7 @@ if [ $INSTALL_POSTGRESQL_SIXTEEN = "True" ]; then
     sudo apt -y install postgresql-16
 else
     echo -e "=== Installing the default postgreSQL version based on Linux version ... ==="
-    sudo apt -y install postgresql postgresql-server-dev-all
+    sudo apt -y install postgresql-16
 fi
 
 echo "=== Starting PostgreSQL service... ==="
@@ -94,8 +94,8 @@ sudo su - postgres -c "createuser -s $OE_USER" 2> /dev/null || true
 # Installing required packages
 #--------------------------------------------------
 echo "=== Installing required packages... ==="
-sudo apt install -y git wget python3-minimal python3-dev python3-pip python3-wheel libxml2-dev libxslt1-dev zlib1g-dev libsasl2-dev libldap2-dev build-essential \
-libssl-dev libffi-dev libmysqlclient-dev libjpeg-dev libpq-dev libjpeg8-dev liblcms2-dev libblas-dev libatlas-base-dev libzip-dev python3-setuptools node-less \
+sudo apt install -y git wget python3 python3-dev python3-pip python3-wheel libxml2-dev libxslt1-dev zlib1g-dev libsasl2-dev libldap2-dev build-essential \
+libssl-dev libffi-dev libmysqlclient-dev libjpeg-dev libpq-dev libjpeg8-dev liblcms2-dev libblas-dev libatlas-base-dev libzip-dev python3-setuptools node-less npm \
 python3-venv python3-cffi gdebi zlib1g-dev curl cython3 python3-openssl
 
 sudo pip3 install --upgrade pip --break-system-packages
@@ -106,8 +106,8 @@ echo "=== Installing xfonts for wkhtmltopdf... ==="
 sudo apt -y install xfonts-75dpi xfonts-encodings xfonts-utils xfonts-base fontconfig
 
 # Install Node.js and npm
-echo "=== Installing Node.js and npm ... ==="
-sudo apt -y install nodejs npm
+echo "=== Installing Node.js  ... ==="
+sudo apt -y install nodejs
 
 sudo ln -s /usr/bin/nodejs /usr/bin/node
 sudo npm install -g less less-plugin-clean-css
@@ -154,8 +154,8 @@ sudo mkdir $OE_HOME/custom
 sudo mkdir $OE_HOME/custom/addons
 
 cd /usr/src/
-sudo git clone https://github.com/hrmuwanika/odooapps18.git
-cp -rf odooapps18/* $OE_HOME/custom/addons
+sudo git clone https://github.com/hrmuwanika/odooapps20.git
+cp -rf odooapps20/* $OE_HOME/custom/addons
 
 echo "Creating enterprise addons directory..."
 sudo mkdir $OE_HOME/enterprise
@@ -199,14 +199,15 @@ echo "=== Creating systemd service file... ==="
 sudo cat <<EOF > /lib/systemd/system/$OE_USER.service
 [Unit]
 Description=Odoo Open Source ERP and CRM
-After=network.target
+Requires=postgresql.service
+After=network.target postgresql.service
 
 [Service]
 Type=simple
 User=$OE_USER
 Group=$OE_USER
 ExecStart=$OE_HOME_EXT/odoo-bin --config /etc/${OE_CONFIG}.conf  --logfile /var/log/${OE_USER}/${OE_CONFIG}.log
-KillMode=mixed
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
