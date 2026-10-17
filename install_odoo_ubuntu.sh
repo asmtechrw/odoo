@@ -50,8 +50,7 @@ ADMIN_EMAIL="odoo@example.com"
 # Update and upgrade the system
 #--------------------------------------------------
 echo -e "=== Updating system packages ... ==="
-sudo apt update 
-sudo apt upgrade -y
+sudo apt update && sudo apt upgrade -y
 sudo apt autoremove -y
 
 #----------------------------------------------------
@@ -77,7 +76,7 @@ timedatectl
 echo -e "=== Install and configure PostgreSQL ... ==="
 if [ $INSTALL_POSTGRESQL_SIXTEEN = "True" ]; then
     echo -e "=== Installing postgreSQL V16 due to the user it's choice ... ==="
-    sudo apt -y install postgresql-16
+    sudo apt -y install postgresql-16 postgresql-contrib postgresql-16-pgvector
 else
     echo -e "=== Installing the default postgreSQL version based on Linux version ... ==="
     sudo apt -y install postgresql-16
@@ -144,9 +143,11 @@ sudo chown -R $OE_USER:$OE_USER /var/log/$OE_USER
 #--------------------------------------------------
 # Install Odoo from source
 #--------------------------------------------------
-echo "=== Cloning Odoo 18 from GitHub ... ==="
+echo "=== Cloning Odoo 20 from GitHub ... ==="
+
 sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/odoo/odoo $OE_HOME_EXT/
-sudo pip3 install -r /$OE_HOME_EXT/requirements.txt --break-system-packages
+pip3 install --upgrade pip --break-system-packages
+pip3 install -r /$OE_HOME_EXT/requirements.txt --break-system-packages
 
 # Create custom addons directory
 echo "Creating custom addons directory..."
@@ -160,6 +161,8 @@ cp -rf odooapps20/* $OE_HOME/custom/addons
 echo "Creating enterprise addons directory..."
 sudo mkdir $OE_HOME/enterprise
 sudo mkdir $OE_HOME/enterprise/addons
+# cd $OE_HOME/enterprise
+# sudo git clone --depth 1 --branch $OE_VERSION https://github.com/odoo/enterprise.git addons
 
 echo "=== Setting permissions on home folder ==="
 sudo chown -R $OE_USER:$OE_USER $OE_HOME/
